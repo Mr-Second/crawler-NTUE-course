@@ -1,6 +1,8 @@
 require 'crawler_rocks'
 require 'json'
 require 'pry'
+require 'iconv'
+
 
 class NationalTaipeiUniversityOfEducationCrawler
 
@@ -12,6 +14,7 @@ class NationalTaipeiUniversityOfEducationCrawler
 		@after_each_proc = after_each
 
 		@query_url = 'http://apstu.ntue.edu.tw/Secure/default.aspx'
+		@ic = Iconv.new('utf-8//tranlit//IGNORE', 'utf-8')
 	end
 
 	def courses
@@ -33,7 +36,7 @@ class NationalTaipeiUniversityOfEducationCrawler
 
 		@query_url = 'http://apstu.ntue.edu.tw/Message/Main.aspx'
 		r = RestClient.get @query_url, {"Cookie" => cookie }
-		doc = Nokogiri::HTML(r)
+		doc = Nokogiri::HTML(@ic.iconv(r))
 
 		hidden = Hash[doc.css('input[type="hidden"]').map{|hidden| [hidden[:name], hidden[:value]]}]
 
@@ -47,7 +50,7 @@ class NationalTaipeiUniversityOfEducationCrawler
 		hidden = Hash[doc.css('input[type="hidden"]').map{|hidden| [hidden[:name], hidden[:value]]}]
 
 		@query_url = "http://apstu.ntue.edu.tw/Message/SubMenuPage.aspx"
-		r = RestClient.post(@query_url, hidden.merge({"__EVENTTARGET" => "SubMenu$dgData$ctl02$ctl00"}), {"Cookie" => cookie	})
+		r = RestClient.post(@query_url, hidden.merge({"__EVENTTARGET" => "SubMenu$dgData$ctl02$ctl00"}), {"Cookie" => cookie })
 
 		@query_url = 'http://apstu.ntue.edu.tw/A04/A0428S3Page.aspx'
 		r = RestClient.get @query_url, {"Cookie" => cookie }
