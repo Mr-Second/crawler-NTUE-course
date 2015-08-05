@@ -62,7 +62,7 @@ class NationalTaipeiUniversityOfEducationCrawler
 				page = page - 9
 			elsif page > 20 && page < 28
 				page = "0" + (page - 18).to_s
-			elsif page = 28
+			elsif page == 28
 				page = 10
 			end
 # print page,"\n"
